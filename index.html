@@ -1,0 +1,301 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Idea Spark</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+
+<main class="wrap">
+  <div class="brand"><i></i><span>Idea Spark</span></div>
+
+  <header>
+    <h1>Press the button, get an idea.</h1>
+    <p class="lede">Pick a topic, or leave it on Anything. Every press gives you something new to start on today.</p>
+  </header>
+
+  <div class="chips" id="chips" role="group" aria-label="Topic"></div>
+
+  <button class="go" id="go" type="button">Give me an idea</button>
+
+  <article class="ticket" id="ticket" aria-label="Your idea">
+    <div class="ticket-top"><span id="tag">Idea</span><span id="num">No. 001</span></div>
+    <div class="ticket-main">
+      <h2 class="head" id="head"></h2>
+      <p class="pitch" id="pitch"></p>
+    </div>
+    <dl class="facts">
+      <div><dt>Twist</dt><dd id="twist"></dd></div>
+      <div><dt>First step</dt><dd id="step"></dd></div>
+    </dl>
+    <div class="actions">
+      <button class="small" id="save" type="button" aria-pressed="false">Save</button>
+      <button class="small" id="copy" type="button">Copy</button>
+    </div>
+  </article>
+
+  <section class="saved" aria-labelledby="savedTitle">
+    <h2 id="savedTitle">Saved ideas</h2>
+    <p class="note">Kept in this browser only.</p>
+    <p class="empty" id="empty">Press Save on an idea you like and it will appear here.</p>
+    <ul id="savedList"></ul>
+  </section>
+
+  <div class="sr" id="status" role="status" aria-live="polite"></div>
+</main>
+
+<script>
+(function () {
+  var R = function (a) { return a[Math.floor(Math.random() * a.length)]; };
+  var cap = function (s) { return s.charAt(0).toUpperCase() + s.slice(1); };
+
+  var CATS = [
+    ["any", "Anything"], ["app", "App"], ["business", "Business"], ["story", "Story"],
+    ["game", "Game"], ["video", "Video"], ["gadget", "Gadget"], ["gift", "Gift"]
+  ];
+
+  var TWISTS = [
+    "Make it work with no internet connection.",
+    "Limit the whole first version to one weekend.",
+    "Add a rule: it cannot cost any money to start.",
+    "Design it so an 8-year-old and an 80-year-old can both use it.",
+    "Let a stranger decide the ending.",
+    "Cut it down to a single feature and do that well.",
+    "Make it funny on purpose.",
+    "Give it a visible countdown.",
+    "Make everything it produces disappear after 24 hours.",
+    "Tie it to one street or neighbourhood.",
+    "Make it something people do together around one table.",
+    "Use only three colours.",
+    "Make it for people who hate the usual version of this.",
+    "Hide a secret that people can discover.",
+    "Let the user's mood change how it behaves.",
+    "Describe it in six words before you start."
+  ];
+
+  var STEPS = [
+    "Sketch it on paper in ten minutes.",
+    "Describe it to one friend and write down their first question.",
+    "Write the one-sentence version and pin it where you will see it.",
+    "List the three things it must do, then cross out everything else.",
+    "Find one similar thing that already exists and note what it gets wrong.",
+    "Name it, then check whether the name is free.",
+    "Make the ugliest possible prototype today.",
+    "Ask three people who fit the audience what annoys them most."
+  ];
+
+  var GEN = {
+    app: function () {
+      var who = ["students", "night-shift nurses", "new parents", "dog owners", "remote teams", "small shop owners", "cyclists", "language learners", "apartment neighbours", "home cooks", "freelance designers", "people who travel between islands", "school sports coaches", "volunteers running a food drive"];
+      var does = ["split shared bills without awkward conversations", "find a quiet place to study nearby", "swap tools and spare parts with people on their street", "plan meals from what is already in the fridge", "turn voice notes into a clean to-do list", "keep track of things they have lent out", "practise a new language in five-minute bursts", "report broken streetlights and see when they get fixed", "share a ride to the same event", "remember small favours owed in both directions", "compare prices at nearby shops in seconds", "build a daily routine that survives a bad week"];
+      var pitch = ["Build it as a simple web page first.", "Start with a spreadsheet and a group chat before writing any code.", "Keep the first version to a single screen.", "Test it with ten real users before adding accounts."];
+      return { head: "An app that helps " + R(who) + " " + R(does) + ".", pitch: R(pitch) };
+    },
+    business: function () {
+      var model = ["a subscription box", "a repair service", "a pop-up stall", "an online marketplace", "a tutoring club", "a rental service", "a delivery route", "a workshop series", "a membership club", "a mobile service that comes to you"];
+      var niche = ["hot sauce lovers", "board game fans", "people with too many house plants", "local musicians", "early-morning commuters", "school sports teams", "home bakers", "vintage electronics collectors", "pet sitters", "small farms", "people moving house", "students living away from home"];
+      var money = ["a flat monthly fee", "a small cut of each sale", "one-off setup fees", "sponsorship from a local shop", "a premium tier for regular customers"];
+      return { head: cap(R(model)) + " for " + R(niche) + ".", pitch: "Earn from " + R(money) + ", and start with customers you can name." };
+    },
+    story: function () {
+      var who = ["a retired lighthouse keeper", "a nervous street magician", "a ship's cook", "a twelve-year-old mapmaker", "a night-bus driver", "a substitute teacher", "a ghost who is bad at haunting", "a robot who runs a small cafe"];
+      var sit = ["finds a door that was not there yesterday", "receives a letter from their future self", "has until sunrise to deliver one package", "wakes up holding everyone else's memories of one day", "inherits a shop that only sells lost things", "notices that the town's clocks all disagree", "is asked to keep a secret for a hundred years"];
+      var set = ["a flooded city", "a mountain railway", "a carnival in winter", "an island with one road", "a space station nobody visits", "a market that moves to a new street each night", "a school during a week-long storm"];
+      return { head: "A story about " + R(who) + " who " + R(sit) + ".", pitch: "Set it in " + R(set) + "." };
+    },
+    game: function () {
+      var kind = ["A card game", "A board game", "A puzzle game", "A platformer", "A party game", "A text adventure", "An idle game", "A tabletop role-playing game"];
+      var theme = ["about running a night market", "where you play the tide", "where every move costs a memory", "set inside a giant clock", "about two rival bakeries", "where the map changes each turn", "about passing messages over a noisy radio", "where you can only move while others are watching"];
+      var win = ["building something before the others notice", "keeping a secret the longest", "trading smarter than everyone else", "finishing a route in the fewest moves", "cooperating without talking"];
+      return { head: R(kind) + " " + R(theme) + ".", pitch: "Players win by " + R(win) + "." };
+    },
+    video: function () {
+      var fmt = ["A 60-second explainer", "A short documentary", "A stop-motion short", "A day-in-the-life vlog", "A tutorial series", "A mock reality show", "An interview series"];
+      var sub = ["the person who fixes everything on your street", "a food nobody orders any more", "how an everyday object really works", "a long-running rivalry between two neighbours' gardens", "a skill learned in 30 days", "the oldest shop in town", "what happens to a school at night"];
+      var con = ["only a phone and natural light", "one location", "no talking, only captions", "a single continuous take", "three props and nothing else"];
+      return { head: R(fmt) + " about " + R(sub) + ".", pitch: "Shoot it with " + R(con) + "." };
+    },
+    gadget: function () {
+      var dev = ["A pocket-sized sensor", "A desk lamp", "A backpack", "A door sign", "A plant pot", "A bike light", "A water bottle", "A keychain"];
+      var does = ["reminds you to take a break", "tells you when the soil is dry", "counts how many people walk past", "glows when the Wi-Fi signal is weak", "warns you when you leave something behind", "plays a tune when someone knocks", "changes colour with the room temperature"];
+      var parts = ["a microcontroller and two sensors", "salvaged parts from old electronics", "a 3D-printed case and a small speaker", "an LED strip and a battery pack", "a Raspberry Pi and a camera"];
+      return { head: R(dev) + " that " + R(does) + ".", pitch: "Build it with " + R(parts) + "." };
+    },
+    gift: function () {
+      var to = ["a friend who just moved away", "someone who already has everything", "a coworker who is leaving", "a grandparent", "a sibling", "a favourite teacher"];
+      var gift = ["a jar of notes to open on a bad day", "a hand-drawn map of every place you laughed together", "a playlist with a story behind each song", "a recipe card for a meal you once shared", "a framed photo with the story written on the back", "a book of vouchers for favours and chores", "a small plant with a care note"];
+      var eff = ["It costs less than a lunch.", "It takes one evening.", "You can make it from things already at home.", "Write the card by hand."];
+      return { head: cap(R(gift)) + " for " + R(to) + ".", pitch: R(eff) };
+    }
+  };
+
+  var KEY = "ideabutton.saved";
+  var cat = "any", count = 0, current = null, timer = null;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var el = { chips: $("chips"), go: $("go"), ticket: $("ticket"), tag: $("tag"), num: $("num"), head: $("head"), pitch: $("pitch"), twist: $("twist"), step: $("step"), save: $("save"), copy: $("copy"), list: $("savedList"), empty: $("empty"), status: $("status") };
+
+  function label(id) { for (var i = 0; i < CATS.length; i++) if (CATS[i][0] === id) return CATS[i][1]; return "Idea"; }
+
+  function make(c) {
+    var id = c;
+    if (id === "any") { var pool = Object.keys(GEN); id = R(pool); }
+    var g = GEN[id]();
+    return { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), cat: label(id), head: g.head, pitch: g.pitch, twist: R(TWISTS), step: R(STEPS) };
+  }
+
+  var saved = [];
+  function load() {
+    try {
+      var v = JSON.parse(localStorage.getItem(KEY));
+      if (Array.isArray(v)) return v.filter(function (x) { return x && typeof x.head === "string"; });
+    } catch (e) {}
+    return [];
+  }
+  function store() { try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {} }
+  function isSaved(id) { return saved.some(function (s) { return s.id === id; }); }
+
+  function paint(idea) {
+    el.tag.textContent = idea.cat;
+    el.num.textContent = "No. " + String(idea.n).padStart(3, "0");
+    el.head.textContent = idea.head;
+    el.pitch.textContent = idea.pitch;
+    el.twist.textContent = idea.twist;
+    el.step.textContent = idea.step;
+    var s = isSaved(idea.id);
+    el.save.setAttribute("aria-pressed", s ? "true" : "false");
+    el.save.textContent = s ? "Saved" : "Save";
+    el.copy.textContent = "Copy";
+  }
+
+  function commit(idea, animate) {
+    idea.n = ++count;
+    current = idea;
+    paint(idea);
+    el.status.textContent = "New idea: " + idea.head;
+    if (animate && !reduce) {
+      el.ticket.classList.remove("settle");
+      void el.ticket.offsetWidth;
+      el.ticket.classList.add("settle");
+    }
+  }
+
+  function roll() {
+    clearInterval(timer);
+    var idea = make(cat);
+    if (reduce) { commit(idea, false); return; }
+    var i = 0;
+    el.ticket.classList.add("rolling");
+    timer = setInterval(function () {
+      i++;
+      if (i < 6) {
+        el.head.textContent = make(cat).head;
+      } else {
+        clearInterval(timer);
+        el.ticket.classList.remove("rolling");
+        commit(idea, true);
+      }
+    }, 70);
+  }
+
+  function renderSaved() {
+    el.list.textContent = "";
+    el.empty.hidden = saved.length > 0;
+    saved.forEach(function (s) {
+      var li = document.createElement("li");
+      var txt = document.createElement("div");
+      txt.className = "txt";
+      var t = document.createElement("div");
+      t.className = "t";
+      t.textContent = s.head;
+      var m = document.createElement("div");
+      m.className = "m";
+      m.textContent = s.cat + " · " + s.pitch;
+      m.style.textTransform = "none";
+      m.style.letterSpacing = "0";
+      txt.appendChild(t);
+      txt.appendChild(m);
+      var rm = document.createElement("button");
+      rm.className = "rm";
+      rm.type = "button";
+      rm.textContent = "Remove";
+      rm.setAttribute("aria-label", "Remove saved idea: " + s.head);
+      rm.addEventListener("click", function () {
+        saved = saved.filter(function (x) { return x.id !== s.id; });
+        store();
+        renderSaved();
+        if (current) paint(current);
+      });
+      li.appendChild(txt);
+      li.appendChild(rm);
+      el.list.appendChild(li);
+    });
+  }
+
+  function plain(idea) {
+    return idea.head + "\n" + idea.pitch + "\nTwist: " + idea.twist + "\nFirst step: " + idea.step;
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  CATS.forEach(function (c) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip";
+    b.textContent = c[1];
+    b.setAttribute("aria-pressed", c[0] === cat ? "true" : "false");
+    b.addEventListener("click", function () {
+      cat = c[0];
+      Array.prototype.forEach.call(el.chips.children, function (x, i) {
+        x.setAttribute("aria-pressed", CATS[i][0] === cat ? "true" : "false");
+      });
+      roll();
+    });
+    el.chips.appendChild(b);
+  });
+
+  el.go.addEventListener("click", roll);
+
+  el.save.addEventListener("click", function () {
+    if (!current) return;
+    if (isSaved(current.id)) {
+      saved = saved.filter(function (x) { return x.id !== current.id; });
+    } else {
+      saved.unshift({ id: current.id, cat: current.cat, head: current.head, pitch: current.pitch, twist: current.twist, step: current.step });
+    }
+    store();
+    renderSaved();
+    paint(current);
+  });
+
+  el.copy.addEventListener("click", function () {
+    if (!current) return;
+    var text = plain(current);
+    var done = function (ok) {
+      el.copy.textContent = ok ? "Copied" : "Copy failed";
+      setTimeout(function () { if (el.copy.textContent !== "Copy") el.copy.textContent = "Copy"; }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(fallbackCopy(text)); });
+    } else {
+      done(fallbackCopy(text));
+    }
+  });
+
+  saved = load();
+  renderSaved();
+  commit(make(cat), false);
+})();
+</script>
+
+</body></html>
